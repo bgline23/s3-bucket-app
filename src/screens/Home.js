@@ -1,13 +1,14 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { S3_BUCKET_NAME, S3_ACCESS_KEY, S3_KEY_ID, AWS_REGION } from "@env";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import Toast from "react-native-root-toast";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
+import ImageList from "../components/ImageList";
 
 const Home = ({ navigation }) => {
   const [isUploading, setisUploading] = useState(false);
@@ -96,11 +97,7 @@ const Home = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <View style={{ alignItems: "center", height: 60 }}>
-        {isUploading && <ActivityIndicator size="large" color="navy" />}
-      </View>
-
-      <Text>Upload an image</Text>
+      {isUploading ? <ActivityIndicator size="large" color="navy" /> : <ImageList />}
     </View>
   );
 };

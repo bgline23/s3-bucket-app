@@ -10,16 +10,18 @@ import Toast from "react-native-root-toast";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ImageList from "../components/ImageList";
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, route }) => {
   const [isLoading, setisLoading] = useState(false);
-  const [images, setimages] = useState([]);
+  const [images, setimages] = useState(null);
 
   useEffect(() => {
     navigation.setOptions({
       headerRight,
     });
-    fetchImages();
-  }, []);
+    if (images === null || route.params?.isDelete) {
+      fetchImages();
+    }
+  }, [navigation, route.params]);
 
   const headerRight = () => {
     return (
@@ -46,7 +48,7 @@ const Home = ({ navigation }) => {
 
         if (isOk) {
           Toast.show("Completed upload", {
-            duration: Toast.durations.SHORT,
+            duration: Toast.durations.LONG,
             backgroundColor: "#32a852",
           });
           fetchImages();
@@ -80,7 +82,7 @@ const Home = ({ navigation }) => {
   };
 
   const handleImagePress = image => {
-    navigation.navigate("ImageModal", { imageName: image.Key });
+    navigation.navigate("Image", { imageName: image.Key });
   };
 
   const pickImage = async () => {

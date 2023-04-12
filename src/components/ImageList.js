@@ -5,11 +5,11 @@ const ImageList = ({ images, onItemPress }) => {
     <FlatList
       contentContainerStyle={[
         { flexGrow: 1, paddingVertical: 10 },
-        images.length ? null : { justifyContent: "center" },
+        images?.length ? null : { justifyContent: "center" },
       ]}
       ListEmptyComponent={<Text>Upload an image</Text>}
       ItemSeparatorComponent={<View style={{ marginVertical: 6 }}></View>}
-      data={images}
+      data={images || []}
       renderItem={({ item }) => {
         const uploadDate = new Date(item.LastModified);
         const month = uploadDate.toLocaleString();

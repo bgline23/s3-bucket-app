@@ -14,12 +14,12 @@ const Layout = () => {
       <StatusBar style="auto" />
       <NavigationContainer>
         <Stack.Navigator>
-          <Stack.Group screenOptions={{ presentation: "modal" }}>
-            <Stack.Screen name="S3 Bucket" component={Home} />
+          <Stack.Group>
+            <Stack.Screen name="Home" component={Home} options={{ title: "S3 Bucket" }} />
           </Stack.Group>
 
           <Stack.Group screenOptions={{ presentation: "modal" }}>
-            <Stack.Screen name="ImageModal" component={ImageModal} />
+            <Stack.Screen name="Image" component={ImageModal} />
           </Stack.Group>
         </Stack.Navigator>
       </NavigationContainer>

@@ -4,6 +4,7 @@ import {
   S3Client,
   ListObjectsV2Command,
   GetObjectCommand,
+  DeleteObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -51,4 +52,15 @@ const downloadImage = async imageName => {
   return imageUrl;
 };
 
-export { fetchImages, downloadImage, createPresignedUrl };
+const deleteImage = async imageName => {
+  const command = new DeleteObjectCommand({
+    Bucket: S3_BUCKET_NAME,
+    Key: imageName,
+  });
+
+  const response = await client.send(command);
+
+  return response;
+};
+
+export { fetchImages, downloadImage, createPresignedUrl, deleteImage };

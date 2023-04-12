@@ -1,6 +1,6 @@
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 
-const ImageList = ({ images }) => {
+const ImageList = ({ images, onItemPress }) => {
   return (
     <FlatList
       contentContainerStyle={[
@@ -10,15 +10,23 @@ const ImageList = ({ images }) => {
       ListEmptyComponent={<Text>Upload an image</Text>}
       ItemSeparatorComponent={<View style={{ marginVertical: 6 }}></View>}
       data={images}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          key={item.Key}
-          style={{ padding: 20, borderRadius: 8, backgroundColor: "teal" }}
-          onPress={() => {}}
-        >
-          <Text>{item.Key}</Text>
-        </TouchableOpacity>
-      )}
+      renderItem={({ item }) => {
+        const uploadDate = new Date(item.LastModified);
+        const month = uploadDate.toLocaleString();
+
+        const formattedDate = ` ${month}`;
+
+        return (
+          <TouchableOpacity
+            key={item.Key}
+            style={{ padding: 20, borderRadius: 8, backgroundColor: "#7542f5" }}
+            onPress={() => onItemPress(item)}
+          >
+            <Text style={{ color: "#f5a742", alignSelf: "center" }}>{formattedDate}</Text>
+            <Text style={{ color: "#fff" }}>{item.Key}</Text>
+          </TouchableOpacity>
+        );
+      }}
       keyExtractor={item => item.Key}
     />
   );

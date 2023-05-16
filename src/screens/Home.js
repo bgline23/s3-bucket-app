@@ -1,7 +1,7 @@
-import React from "react";
+import { useContext } from "react";
 import { useState, useEffect } from "react";
-
-import { ActivityIndicator, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Auth } from "aws-amplify";
+import { ActivityIndicator, Alert, StyleSheet, TouchableOpacity, View } from "react-native";
 import * as FileSystem from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
 import * as S3Api from "../S3Api";
@@ -9,10 +9,12 @@ import * as S3Api from "../S3Api";
 import Toast from "react-native-root-toast";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import ImageList from "../components/ImageList";
+import { AuthContext } from "../context";
 
 const Home = ({ navigation, route }) => {
   const [isLoading, setisLoading] = useState(false);
   const [images, setimages] = useState(null);
+  const { authUser, setAuthUser } = useContext(AuthContext);
 
   useEffect(() => {
     navigation.setOptions({
@@ -26,15 +28,31 @@ const Home = ({ navigation, route }) => {
   const headerRight = () => {
     return (
       <>
-        <TouchableOpacity onPress={fetchImages}>
-          <MaterialCommunityIcons name="reload" size={24} color="black" />
-        </TouchableOpacity>
-        <View style={{ marginHorizontal: 6 }}></View>
         <TouchableOpacity onPress={handleUploadPress}>
           <MaterialCommunityIcons name="cloud-upload-outline" size={28} />
         </TouchableOpacity>
+        <View style={{ marginHorizontal: 6 }}></View>
+        <TouchableOpacity onPress={handleSignOutPress}>
+          <MaterialCommunityIcons name="exit-to-app" size={24} color="black" />
+        </TouchableOpacity>
       </>
     );
+  };
+
+  const handleSignOutPress = () => {
+    Alert.alert("Confirm", "Sign out of the app?", [
+      {
+        text: "No",
+        style: "cancel",
+      },
+      {
+        text: "Yes",
+        onPress: () =>
+          Auth.signOut().then(() => {
+            setAuthUser(null);
+          }),
+      },
+    ]);
   };
 
   const handleUploadPress = async () => {
@@ -118,7 +136,7 @@ const Home = ({ navigation, route }) => {
       {isLoading ? (
         <ActivityIndicator size="large" />
       ) : (
-        <ImageList images={images} onItemPress={handleImagePress} />
+        <ImageList images={images} onItemPress={handleImagePress} onRefresh={fetchImages} />
       )}
     </View>
   );

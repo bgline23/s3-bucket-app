@@ -1,8 +1,10 @@
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 
-const ImageList = ({ images, onItemPress }) => {
+const ImageList = ({ images, onItemPress, onRefresh }) => {
   return (
     <FlatList
+      refreshing={images === null}
+      onRefresh={onRefresh}
       contentContainerStyle={[
         { flexGrow: 1, paddingVertical: 10 },
         images?.length ? null : { justifyContent: "center" },

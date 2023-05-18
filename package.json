@@ -1,14 +1,15 @@
 {
   "name": "s3-bucket-app",
   "version": "1.0.0",
-  "main": "node_modules/expo/AppEntry.js",
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web"
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "eas-build-pre-install": "echo $AWS_EXPORTS | base64 --decode > ./src/aws-exports.js"
   },
   "dependencies": {
+    "@aws-amplify/auth": "^5.3.6",
     "@aws-sdk/chunked-blob-reader": "^3.303.0",
     "@aws-sdk/client-s3": "^3.306.0",
     "@aws-sdk/s3-request-presigner": "^3.306.0",
@@ -19,8 +20,10 @@
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.12",
     "aws-amplify": "^5.2.1",
-    "expo": "^47.0.0",
+    "expo": "~47.0.14",
     "expo-image-picker": "~14.0.2",
+    "expo-linking": "~3.3.1",
+    "expo-splash-screen": "~0.17.5",
     "expo-status-bar": "~1.4.4",
     "expo-web-browser": "~12.0.0",
     "react": "18.1.0",

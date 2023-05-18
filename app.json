@@ -21,10 +21,17 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.codetangent.s3bucketapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "scheme": "s3bucketapp",
+    "extra": {
+      "eas": {
+        "projectId": "7d9c63b1-5afc-4eaa-8afc-d363000d9d82"
+      }
     }
   }
 }

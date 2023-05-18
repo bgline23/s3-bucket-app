@@ -1,17 +1,22 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Alert, Button, Pressable, StyleSheet, Linking, View, Image, Text } from "react-native";
+import { Alert, Button, Pressable, StyleSheet, View, Image, Text } from "react-native";
+import * as Linking from "expo-linking";
 import { Amplify, Auth, Hub } from "aws-amplify";
 import { CognitoHostedUIIdentityProvider } from "@aws-amplify/auth";
 import awsConfig from "../aws-exports";
 import * as WebBrowser from "expo-web-browser";
 import { AuthContext } from "../context";
+import Toast from "react-native-root-toast";
+import { useFocusEffect } from "@react-navigation/native";
 
-const SignIn = () => {
-  const [isAuthenticating, setIsAuthenticating] = useState(null);
+const SignIn = ({ navigation }) => {
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [customState, setCustomState] = useState(null);
   const { setAuthUser } = useContext(AuthContext);
 
   useEffect(() => {
+    configureRedirects();
+
     const unsubscribe = Hub.listen("auth", ({ payload: { event, data } }) => {
       switch (event) {
         case "signIn":
@@ -25,36 +30,54 @@ const SignIn = () => {
       }
     });
 
-    Auth.currentAuthenticatedUser()
-      .then(currentUser => setAuthUser(currentUser))
-      .catch(() => {
-        //"Not signed in"
-        setIsAuthenticating(false);
-      });
-
     return unsubscribe;
   }, []);
 
-  async function urlOpener(url, redirectUrl) {
-    const { type, url: newUrl } = await WebBrowser.openAuthSessionAsync(url, redirectUrl, {
-      showTitle: false,
-      enableUrlBarHiding: true,
-      enableDefaultShare: false,
-      ephemeralWebSession: false,
-    });
+  const configureRedirects = () => {
+    const signInRedirects = awsConfig ? awsConfig.oauth.redirectSignIn?.split(",") || [] : [];
+    let redirect = "";
+    let link = Linking.createURL();
+    link += link.endsWith("/") ? "" : "/";
 
-    if (type === "success") {
-      Linking.openURL(newUrl);
+    redirect = signInRedirects.find(r => r === link) || "no_redirects";
+
+    awsConfig.oauth.redirectSignIn = redirect;
+    awsConfig.oauth.redirectSignOut = redirect;
+
+    Amplify.configure({
+      ...awsConfig,
+      oauth: {
+        ...awsConfig.oauth,
+        urlOpener,
+      },
+    });
+  };
+
+  async function urlOpener(url, redirectUrl) {
+    try {
+      const { type, url: newUrl } = await WebBrowser.openAuthSessionAsync(url, redirectUrl, {
+        showTitle: false,
+        enableUrlBarHiding: true,
+        enableDefaultShare: false,
+        ephemeralWebSession: false,
+      });
+
+      if (type === "success") {
+        Linking.openURL(newUrl);
+      }
+      Auth.currentAuthenticatedUser()
+        .then(currentUser => setAuthUser(currentUser))
+        .catch(() => {
+          //"Not signed in"
+          setIsAuthenticating(false);
+        });
+    } catch (error) {
+      Toast.show(error.message, {
+        duration: Toast.durations.LONG,
+        backgroundColor: "salmon",
+      });
     }
   }
-
-  Amplify.configure({
-    ...awsConfig,
-    oauth: {
-      ...awsConfig.oauth,
-      urlOpener,
-    },
-  });
 
   const handleGoogleButtonPress = async () => {
     Auth.federatedSignIn({ provider: CognitoHostedUIIdentityProvider.Google })
@@ -64,16 +87,10 @@ const SignIn = () => {
       });
   };
 
-  const handleSignOut = async () => {
-    try {
-      await Auth.signOut();
-    } catch (error) {
-      Alert.alert("Sign Out", error.message);
-    }
-  };
   return (
     <View style={styles.container}>
       <Text style={{ fontSize: 32 }}>S3 Bucket</Text>
+      <Text style={{ fontSize: 32 }}>{}</Text>
       <Image
         style={{ resizeMode: "cover", width: "100%", height: "50%", marginVertical: 20 }}
         source={require("../../assets/Bucket.png")}
